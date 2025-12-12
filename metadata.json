@@ -1,0 +1,8 @@
+{
+  "name": "Main Orbitz",
+  "description": "A video-call style translation messenger using Web Speech API for transcription and Gemini 2.5 for high-fidelity audio translation.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}

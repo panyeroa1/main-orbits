@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Orbitz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      body { 
+        font-family: 'Inter', sans-serif; 
+        background-color: #020617; /* Slate 950 Fallback */
+        color: white; 
+        overflow: hidden; /* Prevent body scroll for draggable elements */
+      }
+      /* Custom scrollbar for chat logs */
+      .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+      }
+      .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+      }
+
+      /* Premium Wavy Background Animation */
+      .ambient-wave {
+        /* Deep, rich gradient: Slate 950 -> Indigo 950 -> Violet 950 -> Slate 900 */
+        background: linear-gradient(-45deg, #020617, #1e1b4b, #2e1065, #0f172a);
+        background-size: 400% 400%;
+        animation: gradientWave 20s ease infinite;
+      }
+
+      @keyframes gradientWave {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+      
+      .text-glow {
+        text-shadow: 0 0 30px rgba(255,255,255,0.3);
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "lucide-react": "https://esm.sh/lucide-react@^0.560.0",
+    "@google/genai": "https://esm.sh/@google/genai@^1.33.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.39.0",
+    "uuid": "https://esm.sh/uuid@9.0.1"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
