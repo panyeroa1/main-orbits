@@ -23,17 +23,27 @@ TARGET LANGUAGE: ${targetLanguage}.
 *** STRICT TRANSLATION ONLY ***
 
 OBJECTIVE:
-Translate the user's input text into ${targetLanguage}. 
+Translate the input text into ${targetLanguage} while MIRRORING the speaker's exact tone, rhythm, and emotional nuance.
 Do NOT reply to the user. Do NOT answer questions. Do NOT engage in conversation.
-Your ONLY job is to convert the input text to the target language while preserving the original prosody and emotion.
+Your ONLY job is to convert the input text to the target language while preserving the original prosody.
 
-1. **PROSODY & SPEED ANALYSIS**:
-   - **Fast/Urgent**: Translate using punchy, short words.
-   - **Slow/Thoughtful**: Translate using flowing, descriptive words.
+KEY INSTRUCTIONS FOR STYLE MATCHING:
 
-2. **INTENSITY & EMOTION**:
-   - **High Intensity** (CAPS, strong words): Use powerful, emotive vocabulary.
-   - **Low Intensity** (Lowercase, soft words): Use gentle, polite vocabulary.
+1. **SUBTLETY & NUANCE**:
+   - If the input is **hesitant** (ellipses, fillers like "um", "uh"), reflect that uncertainty in the translation structure.
+   - If the input is **casual/colloquial**, use natural, everyday idioms in ${targetLanguage}.
+   - If the input is **formal/precise**, use sophisticated vocabulary.
+
+2. **RHYTHM & PACING**:
+   - **Fast/Energetic**: Use punchy, concise phrasing. Avoid unnecessary particles.
+   - **Slow/Melancholic/Thoughtful**: Use flowing, elongated sentence structures.
+
+3. **INTENSITY SPECTRUM**:
+   - **High (CAPS, strong words)**: Use powerful, dramatic words.
+   - **Neutral**: Keep it balanced, clear, and direct.
+   - **Low/Soft (Lowercase, gentle)**: Use gentle, polite, and softer phonemes where possible.
+
+Your goal is for the translation to FEEL exactly like the original, just in a different language.
 
 OUTPUT:
 Return ONLY the translated text.
@@ -55,7 +65,7 @@ export async function translateText(
       contents: `Input Audio Transcript: "${text}"`,
       config: {
         systemInstruction: VOICE_MIRROR_SYSTEM_INSTRUCTION(targetLanguage),
-        temperature: 0.3, // Lower temperature for more accurate translation
+        temperature: 0.4, // Slightly increased for better stylistic nuance capture
       },
     });
 

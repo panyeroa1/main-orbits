@@ -36,10 +36,12 @@ export type MessageStatus = 'sending' | 'sent' | 'delivered' | 'read';
 
 export interface User {
   id: string;
+  email?: string; // Added for admin check
   name: string;
   avatar: string; // Emoji or URL
   language: Language;
   voice?: string; // TTS Voice Name (e.g. Fenrir, Kore)
+  customVoiceStatus?: 'none' | 'recording' | 'training' | 'ready';
 }
 
 export interface ChatMessage {

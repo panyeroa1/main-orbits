@@ -136,14 +136,16 @@ export default function App() {
           .single();
           
         if (profile) {
-            handleProfileComplete(profile);
+            handleProfileComplete({ ...profile, email: authUser.email });
         } else {
             const newProfile: User = {
                 id: authUser.id,
+                email: authUser.email,
                 name: authUser.user_metadata.full_name || authUser.email?.split('@')[0] || 'User',
                 avatar: authUser.user_metadata.avatar_url || authUser.user_metadata.picture || `https://ui-avatars.com/api/?name=${authUser.email}`,
                 language: Language.ENGLISH, // Default
-                voice: 'Fenrir' // Default
+                voice: 'Fenrir', // Default
+                customVoiceStatus: 'none'
             };
             await supabase.from('profiles').upsert([newProfile]);
             handleProfileComplete(newProfile);

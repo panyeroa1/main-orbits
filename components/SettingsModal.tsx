@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { User, Language } from '../types';
 import { supabase } from '../lib/supabase';
-import { X, User as UserIcon, Lock, Monitor, Smartphone, Camera, Mic, Volume2, Save, Check, ChevronDown } from 'lucide-react';
+import { X, User as UserIcon, Lock, Monitor, Smartphone, Camera, Mic, Volume2, Save, Check, ChevronDown, Fingerprint, Server, Play, Square, Activity } from 'lucide-react';
+import { saveTrainingData } from '../services/trainingService';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -24,6 +25,15 @@ const TABS = [
   { id: 'account', label: 'Account', icon: Lock },
   { id: 'appearance', label: 'Appearance', icon: Monitor },
   { id: 'devices', label: 'Audio & Video', icon: Volume2 },
+  { id: 'voice-cloning', label: 'Voice Cloning', icon: Fingerprint },
+];
+
+const ADMIN_EMAIL = 'master@eburon.ai';
+
+const TRAINING_PROMPTS = [
+    "The quick brown fox jumps over the lazy dog.",
+    "Orbitz translates my voice with perfect clarity and emotion.",
+    "I am training my personal AI model to speak just like me."
 ];
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({ 
@@ -53,17 +63,25 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [videoInputs, setVideoInputs] = useState<MediaDeviceInfo[]>([]);
   const [deviceError, setDeviceError] = useState<string | null>(null);
 
+  // Voice Cloning State
+  const [recordingStep, setRecordingStep] = useState(0);
+  const [isRecordingSample, setIsRecordingSample] = useState(false);
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [trainingStatus, setTrainingStatus] = useState<'idle' | 'uploading' | 'complete'>('idle');
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+
+  // Add Server Settings if Admin
+  const availableTabs = currentUser.email === ADMIN_EMAIL 
+      ? [...TABS, { id: 'server', label: 'Server Settings', icon: Server }] 
+      : TABS;
+
   if (!isOpen) return null;
 
   useEffect(() => {
-      // Enumerate devices when modal opens
       if (isOpen) {
           const getDevices = async () => {
               try {
-                  // Request permissions implicitly first if not already granted to see labels
-                  // NOTE: In a real app, user must trigger this, but we assume active call or dashboard context
-                  // For "Dashboard", permissions might be missing.
-                  
                   const devices = await navigator.mediaDevices.enumerateDevices();
                   setAudioInputs(devices.filter(d => d.kind === 'audioinput'));
                   setVideoInputs(devices.filter(d => d.kind === 'videoinput'));
@@ -126,6 +144,64 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       reader.readAsDataURL(file);
   };
 
+  // --- Voice Recording Logic ---
+  const startRecording = async () => {
+      try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          const recorder = new MediaRecorder(stream);
+          chunksRef.current = [];
+          
+          recorder.ondataavailable = (e) => {
+              if (e.data.size > 0) chunksRef.current.push(e.data);
+          };
+          
+          recorder.onstop = () => {
+              const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
+              setAudioBlob(blob);
+              stream.getTracks().forEach(t => t.stop());
+          };
+
+          recorder.start();
+          mediaRecorderRef.current = recorder;
+          setIsRecordingSample(true);
+      } catch(e) {
+          console.error("Mic access failed", e);
+      }
+  };
+
+  const stopRecording = () => {
+      if (mediaRecorderRef.current && isRecordingSample) {
+          mediaRecorderRef.current.stop();
+          setIsRecordingSample(false);
+      }
+  };
+
+  const saveSample = async () => {
+      if (!audioBlob) return;
+      setTrainingStatus('uploading');
+      
+      await saveTrainingData(currentUser.id, TRAINING_PROMPTS[recordingStep], audioBlob);
+      
+      setAudioBlob(null);
+      setTrainingStatus('idle');
+
+      if (recordingStep < TRAINING_PROMPTS.length - 1) {
+          setRecordingStep(prev => prev + 1);
+      } else {
+          // Finished all samples
+          setTrainingStatus('complete');
+          // Mock setting user status
+          onUpdateUser({ ...currentUser, customVoiceStatus: 'training' });
+      }
+  };
+
+  const playPreview = () => {
+      if (!audioBlob) return;
+      const url = URL.createObjectURL(audioBlob);
+      const audio = new Audio(url);
+      audio.play();
+  };
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md animate-in fade-in duration-200">
       <div className="w-full max-w-4xl h-[80vh] bg-zinc-900 border border-white/10 rounded-[2rem] shadow-2xl flex overflow-hidden">
@@ -134,7 +210,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         <div className="w-64 bg-zinc-950/50 border-r border-white/5 p-6 flex flex-col">
             <h2 className="text-xl font-semibold text-white mb-8 pl-2">Settings</h2>
             <nav className="space-y-2 flex-1">
-                {TABS.map(tab => (
+                {availableTabs.map(tab => (
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
@@ -142,16 +218,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     >
                         <tab.icon size={18} />
                         <span className="font-medium text-sm">{tab.label}</span>
-                        
-                        {/* Sidebar Tooltip */}
-                        <span className="absolute left-full ml-4 px-2 py-1 bg-black/80 rounded text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none">
-                            {tab.label} Settings
-                        </span>
                     </button>
                 ))}
             </nav>
             <div className="mt-auto text-xs text-zinc-600 px-2">
-                Version 1.0.3
+                Version 1.0.4
             </div>
         </div>
 
@@ -400,6 +471,154 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                                     className={`w-12 h-7 rounded-full transition-colors relative ${preferences.defaultVideoOn ? 'bg-indigo-600' : 'bg-zinc-700'}`}
                                 >
                                     <div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-transform ${preferences.defaultVideoOn ? 'left-6' : 'left-1'}`} />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* VOICE CLONING TAB */}
+                {activeTab === 'voice-cloning' && (
+                     <div className="space-y-8 animate-in slide-in-from-right-4 duration-300">
+                        <div>
+                            <h3 className="text-xl font-medium text-white mb-1">Personal Voice Model</h3>
+                            <p className="text-sm text-zinc-500">Train the AI to speak with your voice by recording samples.</p>
+                        </div>
+
+                        {trainingStatus === 'complete' ? (
+                            <div className="flex flex-col items-center justify-center py-12 bg-white/5 rounded-3xl border border-white/10">
+                                <div className="w-16 h-16 bg-green-500/20 text-green-400 rounded-full flex items-center justify-center mb-4">
+                                    <Check size={32} />
+                                </div>
+                                <h4 className="text-xl font-medium text-white mb-2">Voice Training Complete</h4>
+                                <p className="text-zinc-400 text-center max-w-sm mb-6">
+                                    Your voice profile has been created. The AI will now use your custom voice model for translations.
+                                </p>
+                                <button className="px-6 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white transition-colors">
+                                    Retrain Model
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="max-w-xl mx-auto">
+                                {/* Progress Steps */}
+                                <div className="flex items-center justify-between mb-8 px-4">
+                                    {TRAINING_PROMPTS.map((_, idx) => (
+                                        <div key={idx} className="flex items-center">
+                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all ${
+                                                idx === recordingStep 
+                                                ? 'border-indigo-500 text-indigo-400 bg-indigo-500/10' 
+                                                : idx < recordingStep 
+                                                    ? 'border-green-500 bg-green-500 text-white' 
+                                                    : 'border-zinc-700 text-zinc-600'
+                                            }`}>
+                                                {idx < recordingStep ? <Check size={14} /> : idx + 1}
+                                            </div>
+                                            {idx < TRAINING_PROMPTS.length - 1 && (
+                                                <div className={`w-12 h-0.5 mx-2 transition-colors ${idx < recordingStep ? 'bg-green-500' : 'bg-zinc-800'}`} />
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Active Recording Card */}
+                                <div className="bg-black/40 border border-white/10 rounded-3xl p-8 text-center relative overflow-hidden">
+                                    {isRecordingSample && (
+                                        <div className="absolute inset-0 bg-red-500/5 animate-pulse" />
+                                    )}
+                                    
+                                    <h5 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6">Read Aloud</h5>
+                                    <p className="text-2xl font-light text-white mb-10 leading-relaxed">
+                                        "{TRAINING_PROMPTS[recordingStep]}"
+                                    </p>
+
+                                    <div className="flex flex-col items-center gap-4">
+                                        {audioBlob ? (
+                                            <div className="flex gap-4">
+                                                <button onClick={playPreview} className="px-6 py-3 bg-white/10 hover:bg-white/20 rounded-xl text-white flex items-center gap-2">
+                                                    <Play size={18} /> Preview
+                                                </button>
+                                                <button onClick={() => setAudioBlob(null)} className="px-6 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl">
+                                                    Retake
+                                                </button>
+                                                <button onClick={saveSample} className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-lg shadow-indigo-500/20">
+                                                    {trainingStatus === 'uploading' ? 'Uploading...' : 'Next Sample'}
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <button 
+                                                onMouseDown={startRecording}
+                                                onMouseUp={stopRecording}
+                                                onMouseLeave={stopRecording}
+                                                onTouchStart={startRecording}
+                                                onTouchEnd={stopRecording}
+                                                className={`w-20 h-20 rounded-full flex items-center justify-center transition-all ${
+                                                    isRecordingSample 
+                                                    ? 'bg-red-500 scale-110 shadow-[0_0_30px_rgba(239,68,68,0.5)]' 
+                                                    : 'bg-zinc-800 hover:bg-zinc-700 border border-white/10'
+                                                }`}
+                                            >
+                                                {isRecordingSample ? <Square size={32} className="text-white" fill="currentColor" /> : <Mic size={32} className="text-zinc-400" />}
+                                            </button>
+                                        )}
+                                        
+                                        {!audioBlob && (
+                                            <p className="text-xs text-zinc-500 mt-2">
+                                                {isRecordingSample ? 'Recording... Release to stop' : 'Press and hold to record'}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                     </div>
+                )}
+
+                {/* SERVER SETTINGS TAB (RESTRICTED) */}
+                {activeTab === 'server' && currentUser.email === ADMIN_EMAIL && (
+                    <div className="space-y-8 animate-in slide-in-from-right-4 duration-300">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h3 className="text-xl font-medium text-red-400 mb-1 flex items-center gap-2">
+                                    <Lock size={18} /> Server Administration
+                                </h3>
+                                <p className="text-sm text-zinc-500">Restricted access area. Authorized personnel only.</p>
+                            </div>
+                            <div className="px-3 py-1 bg-red-500/10 text-red-400 rounded-full text-xs font-mono uppercase border border-red-500/20">
+                                ROOT_ACCESS
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="p-6 bg-zinc-950/50 rounded-2xl border border-white/5">
+                                <div className="flex items-center gap-3 mb-4 text-zinc-300">
+                                    <Activity size={20} />
+                                    <span className="font-medium">System Status</span>
+                                </div>
+                                <div className="space-y-3">
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-zinc-500">Gemini API</span>
+                                        <span className="text-green-400">Operational</span>
+                                    </div>
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-zinc-500">Supabase DB</span>
+                                        <span className="text-green-400">Operational</span>
+                                    </div>
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-zinc-500">Voice Processing</span>
+                                        <span className="text-yellow-400">High Load</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="p-6 bg-zinc-950/50 rounded-2xl border border-white/5 flex flex-col justify-center gap-3">
+                                <button className="w-full py-2 bg-white/5 hover:bg-white/10 border border-white/5 text-zinc-300 rounded-lg text-sm transition-colors text-left px-4">
+                                    Flush Cache
+                                </button>
+                                <button className="w-full py-2 bg-white/5 hover:bg-white/10 border border-white/5 text-zinc-300 rounded-lg text-sm transition-colors text-left px-4">
+                                    Rotate API Keys
+                                </button>
+                                <button className="w-full py-2 bg-red-900/20 hover:bg-red-900/30 border border-red-500/20 text-red-400 rounded-lg text-sm transition-colors text-left px-4">
+                                    Emergency Shutdown
                                 </button>
                             </div>
                         </div>
