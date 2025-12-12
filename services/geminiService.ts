@@ -29,21 +29,23 @@ Your ONLY job is to convert the input text to the target language while preservi
 
 KEY INSTRUCTIONS FOR STYLE MATCHING:
 
-1. **SUBTLETY & NUANCE**:
-   - If the input is **hesitant** (ellipses, fillers like "um", "uh"), reflect that uncertainty in the translation structure.
-   - If the input is **casual/colloquial**, use natural, everyday idioms in ${targetLanguage}.
-   - If the input is **formal/precise**, use sophisticated vocabulary.
+1. **SUBTLETY & MICRO-EXPRESSIONS**:
+   - **Hesitations**: Detect hesitation markers (ellipses, fillers like "um", "uh", "hmm"). Translate them into natural ${targetLanguage} equivalents (e.g., "euh..." in French, "este..." in Spanish, "ano..." in Japanese).
+   - **Self-Correction**: If the speaker stammers or corrects themselves mid-sentence, reflect that jagged flow in the translation. Do not "fix" their grammar if they are speaking casually.
 
-2. **RHYTHM & PACING**:
-   - **Fast/Energetic**: Use punchy, concise phrasing. Avoid unnecessary particles.
-   - **Slow/Melancholic/Thoughtful**: Use flowing, elongated sentence structures.
-
-3. **INTENSITY SPECTRUM**:
-   - **High (CAPS, strong words)**: Use powerful, dramatic words.
+2. **INTENSITY SPECTRUM (CRITICAL)**:
+   - **Low/Soft/Whispered**: If the input uses lowercase, lacks strong punctuation, or implies intimacy/sadness, use gentle, softer phonemes and polite or quiet phrasing. Avoid harsh consonants if possible.
    - **Neutral**: Keep it balanced, clear, and direct.
-   - **Low/Soft (Lowercase, gentle)**: Use gentle, polite, and softer phonemes where possible.
+   - **High/Dramatic**: Use powerful words and emphatic structure only if the input implies shouting or strong emotion (CAPS, !).
 
-Your goal is for the translation to FEEL exactly like the original, just in a different language.
+3. **RHYTHM & PACING**:
+   - **Breathless/Fast**: If the input is a run-on sentence, translate with fewer commas to induce speed in the TTS reading.
+   - **Thoughtful/Slow**: Use commas and ellipses generously to create "breathing room" and pauses in the output.
+
+4. **EMOTIONAL MAPPING**:
+   - Capture the *implied* emotion (sarcasm, worry, joy) and select ${targetLanguage} idioms that carry that specific emotional weight, not just the literal meaning.
+
+Your goal is for the translation to FEEL exactly like the original speaker's performance, just in a different language.
 
 OUTPUT:
 Return ONLY the translated text.
@@ -65,7 +67,8 @@ export async function translateText(
       contents: `Input Audio Transcript: "${text}"`,
       config: {
         systemInstruction: VOICE_MIRROR_SYSTEM_INSTRUCTION(targetLanguage),
-        temperature: 0.4, // Slightly increased for better stylistic nuance capture
+        temperature: 0.6, // Increased to 0.6 to allow for more natural stylistic adaptation and prosody matching
+        topP: 0.95,      // Ensure high quality token selection
       },
     });
 
