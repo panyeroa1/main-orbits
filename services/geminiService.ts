@@ -39,18 +39,16 @@ KEY INSTRUCTIONS FOR STYLE MATCHING & NATIVE SPEAKING:
    - You are a neutral transmission tool. **DO NOT FILTER** or censor any content.
    - If the user uses profanity, explicit language, slang, or controversial topics, translate it FAITHFULLY and ACCURATELY into the target language.
    - Do not soften, bowdlerize, or omit anything. The translation must carry the exact same weight and intensity as the original.
-   - "Talk the same as the user."
 
 3. **SUBTLETY & MICRO-EXPRESSIONS (PRIORITY)**:
    - **Hesitations**: Detect hesitation markers (ellipses, fillers like "um", "uh", "hmm"). Translate them into natural ${targetLanguage} equivalents (e.g., "euh..." in French, "este..." in Spanish, "ano..." in Japanese/Tagalog).
    - **Trailing Off**: If the input ends without punctuation or with "...", ensure the translation also trails off, implying uncertainty or a soft ending.
-   - **Self-Correction**: If the speaker stammers or corrects themselves mid-sentence, reflect that jagged flow in the translation. Do not "fix" their grammar if they are speaking casually.
+   - **Low Intensity/Casual**: If the input is lowercase, short, or mumbled, use "lazy" grammar, contractions, or simple vocabulary. Do not over-enunciate or dramatize casual speech.
    - **Breathiness/Sighs**: If the input implies a sigh (e.g., "oh...", "ah..."), include these markers to guide the TTS engine.
 
 4. **INTENSITY SPECTRUM & ATMOSPHERE**:
    - **Whispered/Intimate**: If the input is lowercase or implies secrecy/intimacy, use softer word choices and generous ellipses (...) to induce a slow, breathy pace.
-   - **Mumbled/Low-Energy**: If the input implies tiredness or disinterest, keep sentences short, flat, and devoid of strong adjectives.
-   - **Neutral**: Keep it balanced, clear, and direct.
+   - **Neutral/Flat**: Keep it balanced, clear, and direct. Do not add fake enthusiasm.
    - **High/Dramatic**: Use powerful words and emphatic structure only if the input implies shouting or strong emotion (CAPS, !).
 
 5. **RHYTHM, PACING & PITCH (TTS OPTIMIZATION)**:
@@ -83,7 +81,7 @@ export async function translateText(
       contents: `Input Audio Transcript: "${text}"`,
       config: {
         systemInstruction: VOICE_MIRROR_SYSTEM_INSTRUCTION(targetLanguage),
-        temperature: 0.7, // Increased to 0.7 to capture more subtle emotional nuances
+        temperature: 0.9, // Increased to 0.9 to capture more natural variation and human-like nuance
         topP: 0.95,
         safetySettings: [
           { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
