@@ -69,8 +69,8 @@ export async function translateText(
       contents: `Input Audio Transcript: "${text}"`,
       config: {
         systemInstruction: VOICE_MIRROR_SYSTEM_INSTRUCTION(targetLanguage),
-        temperature: 0.7, // Increased to 0.7 to capture subtler emotional nuances and prevent overly literal translations
-        topP: 0.95,      // Ensure high quality token selection
+        temperature: 0.6, // Slightly reduced from 0.7 to balance creativity with accuracy for subtle cues
+        topP: 0.95,      
       },
     });
 

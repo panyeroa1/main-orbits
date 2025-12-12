@@ -9,7 +9,7 @@
     <style>
       body { 
         font-family: 'Inter', sans-serif; 
-        background-color: #020617; /* Slate 950 Fallback */
+        background-color: #000000; /* Pure Black */
         color: white; 
         overflow: hidden; /* Prevent body scroll for draggable elements */
       }
@@ -22,12 +22,12 @@
           scrollbar-width: none;
       }
 
-      /* Premium Wavy Background Animation */
+      /* Premium Wavy Background Animation - Darker & Slower */
       .ambient-wave {
-        /* Deep, rich gradient: Slate 950 -> Indigo 950 -> Violet 950 -> Slate 900 */
-        background: linear-gradient(-45deg, #020617, #1e1b4b, #2e1065, #0f172a);
+        /* Deep, rich, almost black gradient: Black -> Deep Indigo -> Dark Violet -> Black */
+        background: linear-gradient(-45deg, #000000, #0a0a0a, #110e26, #050505);
         background-size: 400% 400%;
-        animation: gradientWave 20s ease infinite;
+        animation: gradientWave 30s ease infinite;
       }
 
       @keyframes gradientWave {
@@ -37,7 +37,7 @@
       }
       
       .text-glow {
-        text-shadow: 0 0 30px rgba(255,255,255,0.3);
+        text-shadow: 0 0 30px rgba(255,255,255,0.2);
       }
     </style>
   <script type="importmap">

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { User, Language } from '../types';
 import { supabase } from '../lib/supabase';
-import { X, User as UserIcon, Lock, Monitor, Smartphone, Camera, Mic, Volume2, Save, Check, ChevronDown, Fingerprint, Server, Play, Square, Activity } from 'lucide-react';
+import { X, User as UserIcon, Lock, Monitor, Volume2, Save, Check, ChevronDown, Fingerprint, Server, Play, Square, Activity, Mic, Smartphone, Camera } from 'lucide-react';
 import { saveTrainingData } from '../services/trainingService';
 
 interface SettingsModalProps {
@@ -647,4 +647,4 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       </div>
     </div>
   );
-};
+}
