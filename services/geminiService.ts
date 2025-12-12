@@ -31,16 +31,18 @@ KEY INSTRUCTIONS FOR STYLE MATCHING:
 
 1. **SUBTLETY & MICRO-EXPRESSIONS**:
    - **Hesitations**: Detect hesitation markers (ellipses, fillers like "um", "uh", "hmm"). Translate them into natural ${targetLanguage} equivalents (e.g., "euh..." in French, "este..." in Spanish, "ano..." in Japanese).
+   - **Trailing Off**: If the input ends without punctuation or with "...", ensure the translation also trails off, implying uncertainty or a soft ending.
    - **Self-Correction**: If the speaker stammers or corrects themselves mid-sentence, reflect that jagged flow in the translation. Do not "fix" their grammar if they are speaking casually.
 
 2. **INTENSITY SPECTRUM (CRITICAL)**:
-   - **Low/Soft/Whispered**: If the input uses lowercase, lacks strong punctuation, or implies intimacy/sadness, use gentle, softer phonemes and polite or quiet phrasing. Avoid harsh consonants if possible.
+   - **Low/Soft/Whispered**: If the input seems calm, sad, or intimate (lowercase, lack of exclamations), prioritize softer-sounding words and gentle phrasing in ${targetLanguage}. Use lowercase in output if appropriate for the vibe.
    - **Neutral**: Keep it balanced, clear, and direct.
    - **High/Dramatic**: Use powerful words and emphatic structure only if the input implies shouting or strong emotion (CAPS, !).
 
-3. **RHYTHM & PACING**:
+3. **RHYTHM & PACING (TTS OPTIMIZATION)**:
    - **Breathless/Fast**: If the input is a run-on sentence, translate with fewer commas to induce speed in the TTS reading.
-   - **Thoughtful/Slow**: Use commas and ellipses generously to create "breathing room" and pauses in the output.
+   - **Thoughtful/Slow**: Use commas, dashes, and ellipses generously to create "breathing room" and pauses in the output.
+   - **Sentence Fragmenting**: If the speaker speaks in fragments, translate in fragments. Do not combine them into a perfect sentence.
 
 4. **EMOTIONAL MAPPING**:
    - Capture the *implied* emotion (sarcasm, worry, joy) and select ${targetLanguage} idioms that carry that specific emotional weight, not just the literal meaning.
@@ -67,7 +69,7 @@ export async function translateText(
       contents: `Input Audio Transcript: "${text}"`,
       config: {
         systemInstruction: VOICE_MIRROR_SYSTEM_INSTRUCTION(targetLanguage),
-        temperature: 0.6, // Increased to 0.6 to allow for more natural stylistic adaptation and prosody matching
+        temperature: 0.7, // Increased to 0.7 to capture subtler emotional nuances and prevent overly literal translations
         topP: 0.95,      // Ensure high quality token selection
       },
     });
