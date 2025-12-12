@@ -98,8 +98,20 @@ export const useSpeechRecognition = (
   const startRecording = () => {
     if (!mediaStream) return;
     try {
-      // Create new recorder
-      const recorder = new MediaRecorder(mediaStream, { mimeType: 'audio/webm' });
+      // Determine MimeType
+      let options: any = undefined;
+      
+      if (typeof MediaRecorder !== 'undefined' && typeof MediaRecorder.isTypeSupported === 'function') {
+        if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+            options = { mimeType: 'audio/webm;codecs=opus' };
+        } else if (MediaRecorder.isTypeSupported('audio/webm')) {
+            options = { mimeType: 'audio/webm' };
+        } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+            options = { mimeType: 'audio/mp4' };
+        }
+      }
+      
+      const recorder = new MediaRecorder(mediaStream, options);
       
       recorder.ondataavailable = (e) => {
         if (e.data.size > 0) {
@@ -130,7 +142,8 @@ export const useSpeechRecognition = (
         
         // Wait briefly for the stop event to process the last chunk
         setTimeout(() => {
-            const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+            const mimeType = mediaRecorderRef.current?.mimeType || 'audio/webm';
+            const blob = new Blob(audioChunksRef.current, { type: mimeType });
             
             if (onFinalTranscript) {
                 onFinalTranscript(finalText, blob);

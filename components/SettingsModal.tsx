@@ -148,7 +148,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const startRecording = async () => {
       try {
           const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          const recorder = new MediaRecorder(stream);
+          
+          let options: any = undefined;
+          if (typeof MediaRecorder !== 'undefined' && typeof MediaRecorder.isTypeSupported === 'function') {
+            if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+                options = { mimeType: 'audio/webm;codecs=opus' };
+            } else if (MediaRecorder.isTypeSupported('audio/webm')) {
+                options = { mimeType: 'audio/webm' };
+            } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+                options = { mimeType: 'audio/mp4' };
+            }
+          }
+          
+          const recorder = new MediaRecorder(stream, options);
           chunksRef.current = [];
           
           recorder.ondataavailable = (e) => {
@@ -156,7 +168,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           };
           
           recorder.onstop = () => {
-              const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
+              // Create blob with the actual mime type used by the recorder
+              const blob = new Blob(chunksRef.current, { type: recorder.mimeType });
               setAudioBlob(blob);
               stream.getTracks().forEach(t => t.stop());
           };
@@ -197,9 +210,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   const playPreview = () => {
       if (!audioBlob) return;
-      const url = URL.createObjectURL(audioBlob);
-      const audio = new Audio(url);
-      audio.play();
+      try {
+          const url = URL.createObjectURL(audioBlob);
+          const audio = new Audio(url);
+          audio.play().catch(e => console.error("Playback failed:", e));
+      } catch (e) {
+          console.error("Error creating audio preview:", e);
+      }
   };
 
   return (
