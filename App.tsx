@@ -9,6 +9,7 @@ import { CallHistory } from './components/CallHistory';
 import { ParticipantsSidebar } from './components/ParticipantsSidebar';
 import { GoogleIntegrations } from './components/GoogleIntegrations';
 import { SettingsModal } from './components/SettingsModal';
+import { LandingPage } from './components/LandingPage'; // Added Import
 import { useSpeechRecognition } from './hooks/useSpeechRecognition';
 import { useIdle } from './hooks/useIdle'; 
 import { Language, ChatMessage, User, Group, MessageStatus } from './types';
@@ -34,8 +35,8 @@ export interface LiveCaption {
 }
 
 export default function App() {
-  // Navigation State
-  const [view, setView] = useState<'profile' | 'dashboard' | 'call' | 'waiting_room'>('profile');
+  // Navigation State - Default to 'landing'
+  const [view, setView] = useState<'landing' | 'profile' | 'dashboard' | 'call' | 'waiting_room'>('landing');
   const [showHistory, setShowHistory] = useState(false);
   const [showParticipants, setShowParticipants] = useState(false);
   const [googleAction, setGoogleAction] = useState<'calendar' | 'gmail' | 'drive' | null>(null);
@@ -164,9 +165,9 @@ export default function App() {
                 setCurrentUser(user);
                 await loadUserData(user.id);
                 setView('dashboard');
-             } catch(e) { setView('profile'); }
+             } catch(e) { setView('landing'); }
          } else {
-             setView('profile');
+             setView('landing');
          }
          setLoadingInitial(false);
       }
@@ -181,7 +182,7 @@ export default function App() {
         }
         if (event === 'SIGNED_OUT') {
             setCurrentUser(null);
-            setView('profile');
+            setView('landing');
         }
     });
 
@@ -538,6 +539,11 @@ export default function App() {
             />
         </div>
       );
+  }
+
+  // New Landing Page Logic
+  if (view === 'landing') {
+      return <LandingPage onEnter={() => setView('profile')} />;
   }
 
   if (view === 'profile') return <ProfileSetup onComplete={handleProfileComplete} />;
