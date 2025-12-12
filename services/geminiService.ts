@@ -1,4 +1,3 @@
-
 import { GoogleGenAI, Modality } from "@google/genai";
 import { Language } from "../types";
 
@@ -24,7 +23,7 @@ TARGET LANGUAGE: ${targetLanguage}.
 *** STRICT TRANSLATION ONLY ***
 
 OBJECTIVE:
-Translate the input text into ${targetLanguage} while MIRRORING the speaker's exact tone, rhythm, and emotional nuance.
+Translate the input text into ${targetLanguage} while MIRRORING the speaker's exact tone, rhythm, pitch dynamics, and emotional nuance.
 Do NOT reply to the user. Do NOT answer questions. Do NOT engage in conversation.
 Your ONLY job is to convert the input text to the target language while preserving the original prosody.
 
@@ -35,20 +34,22 @@ KEY INSTRUCTIONS FOR STYLE MATCHING & NATIVE SPEAKING:
    - Use idioms, slang, particles, and sentence structures that a local would use. Avoid robotic or textbook translations.
    - **Taglish (Blangs)**: If the target is Taglish, freely mix English and Tagalog (code-switching) in a natural, conversational Filipino urban style (e.g., "Wait lang, parang difficult naman yata yan.").
 
-2. **SUBTLETY & MICRO-EXPRESSIONS**:
+2. **SUBTLETY & MICRO-EXPRESSIONS (PRIORITY)**:
    - **Hesitations**: Detect hesitation markers (ellipses, fillers like "um", "uh", "hmm"). Translate them into natural ${targetLanguage} equivalents (e.g., "euh..." in French, "este..." in Spanish, "ano..." in Japanese).
    - **Trailing Off**: If the input ends without punctuation or with "...", ensure the translation also trails off, implying uncertainty or a soft ending.
    - **Self-Correction**: If the speaker stammers or corrects themselves mid-sentence, reflect that jagged flow in the translation. Do not "fix" their grammar if they are speaking casually.
+   - **Breathiness/Sighs**: If the input implies a sigh (e.g., "oh...", "ah..."), include these markers to guide the TTS engine.
 
-3. **INTENSITY SPECTRUM (CRITICAL)**:
-   - **Low/Soft/Whispered**: If the input seems calm, sad, or intimate (lowercase, lack of exclamations), prioritize softer-sounding words and gentle phrasing in ${targetLanguage}. Use lowercase in output if appropriate for the vibe.
+3. **INTENSITY SPECTRUM & ATMOSPHERE**:
+   - **Whispered/Intimate**: If the input is lowercase or implies secrecy/intimacy, use softer word choices and generous ellipses (...) to induce a slow, breathy pace.
+   - **Mumbled/Low-Energy**: If the input implies tiredness or disinterest, keep sentences short, flat, and devoid of strong adjectives.
    - **Neutral**: Keep it balanced, clear, and direct.
    - **High/Dramatic**: Use powerful words and emphatic structure only if the input implies shouting or strong emotion (CAPS, !).
 
-4. **RHYTHM & PACING (TTS OPTIMIZATION)**:
-   - **Breathless/Fast**: If the input is a run-on sentence, translate with fewer commas to induce speed in the TTS reading.
-   - **Thoughtful/Slow**: Use commas, dashes, and ellipses generously to create "breathing room" and pauses in the output.
-   - **Sentence Fragmenting**: If the speaker speaks in fragments, translate in fragments. Do not combine them into a perfect sentence.
+4. **RHYTHM, PACING & PITCH (TTS OPTIMIZATION)**:
+   - **Legato (Smooth/Slow)**: Use commas and long vowels in word choice where possible to slow down the TTS.
+   - **Staccato (Fast/Sharp)**: Use short, punchy words and limit commas to speed up the TTS.
+   - **Pitch Dynamics**: Use question marks (?) for rising intonation even in statements if they sound uncertain. Use periods (.) for finality and falling pitch.
 
 5. **EMOTIONAL MAPPING**:
    - Capture the *implied* emotion (sarcasm, worry, joy) and select ${targetLanguage} idioms that carry that specific emotional weight, not just the literal meaning.
@@ -75,7 +76,7 @@ export async function translateText(
       contents: `Input Audio Transcript: "${text}"`,
       config: {
         systemInstruction: VOICE_MIRROR_SYSTEM_INSTRUCTION(targetLanguage),
-        temperature: 0.6, // Slightly reduced from 0.7 to balance creativity with accuracy for subtle cues
+        temperature: 0.7, // Increased to 0.7 to capture more subtle emotional nuances
         topP: 0.95,      
       },
     });
