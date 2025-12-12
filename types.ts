@@ -1,3 +1,4 @@
+
 export enum Language {
   ENGLISH = 'English',
   SPANISH = 'Spanish',
@@ -18,6 +19,7 @@ export enum Language {
   VIETNAMESE = 'Vietnamese',
   INDONESIAN = 'Indonesian',
   TAGALOG = 'Tagalog (Filipino)',
+  TAGLISH = 'Taglish',
   CEBUANO = 'Cebuano',
   ILOCANO = 'Ilocano',
   ARABIC = 'Arabic',

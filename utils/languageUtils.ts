@@ -1,3 +1,4 @@
+
 import { Language } from '../types';
 
 export const getSpeechRecognitionLanguage = (lang: Language): string => {
@@ -21,6 +22,7 @@ export const getSpeechRecognitionLanguage = (lang: Language): string => {
     case Language.VIETNAMESE: return 'vi-VN';
     case Language.INDONESIAN: return 'id-ID';
     case Language.TAGALOG: return 'fil-PH'; // Standard Filipino
+    case Language.TAGLISH: return 'fil-PH'; // Taglish uses Filipino base
     case Language.CEBUANO: return 'ceb-PH'; // Supported in some browsers, fallbacks to fil-PH logic in app if needed
     case Language.ILOCANO: return 'ilo-PH'; 
     case Language.ARABIC: return 'ar-SA';
