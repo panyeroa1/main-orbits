@@ -7,19 +7,19 @@ interface LandingPageProps {
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onEnter }) => {
   return (
-    <div className="min-h-screen w-full bg-black text-white font-sans overflow-x-hidden relative selection:bg-indigo-500/30">
+    <div className="h-screen w-full bg-black text-white font-sans overflow-x-hidden overflow-y-auto relative selection:bg-indigo-500/30 scroll-smooth">
       
       {/* Background Layers */}
       <div className="fixed inset-0 ambient-wave opacity-30 pointer-events-none" />
       <div className="fixed inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150 pointer-events-none mix-blend-overlay"></div>
       
       {/* Top Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-6 md:px-12 backdrop-blur-sm bg-black/0">
+      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-6 md:px-12 backdrop-blur-md bg-black/0 border-b border-white/0 transition-all duration-300">
          <div className="flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-700">
              <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(79,70,229,0.5)]">
                  <Globe size={24} className="text-white" />
              </div>
-             <span className="text-2xl font-bold tracking-tighter">Orbitz</span>
+             <span className="text-2xl font-bold tracking-tighter font-[Inter]">Orbitz</span>
          </div>
          <button 
            onClick={onEnter}
@@ -39,7 +39,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnter }) => {
           </div>
 
           {/* Headline */}
-          <h1 className="text-6xl md:text-8xl lg:text-9xl font-light tracking-tighter mb-8 text-transparent bg-clip-text bg-gradient-to-b from-white via-zinc-200 to-zinc-600 animate-in fade-in slide-in-from-bottom-8 duration-1000 leading-[1.1] text-glow">
+          <h1 className="text-6xl md:text-8xl lg:text-9xl font-light tracking-tighter mb-8 text-transparent bg-clip-text bg-gradient-to-b from-white via-zinc-200 to-zinc-600 animate-in fade-in slide-in-from-bottom-8 duration-1000 leading-[1.1] text-glow font-[Inter]">
               Speak <br className="md:hidden" />
               <span className="font-semibold text-white">Universally</span>
           </h1>
@@ -141,7 +141,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnter }) => {
       </section>
 
       {/* Simple Footer */}
-      <footer className="border-t border-white/5 bg-black py-12 px-6 md:px-12 text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-6 opacity-60">
+      <footer className="border-t border-white/5 bg-black py-12 px-6 md:px-12 text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-6 opacity-60 relative z-10">
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 bg-zinc-800 rounded-lg flex items-center justify-center">
                 <Globe size={14} className="text-zinc-400" />

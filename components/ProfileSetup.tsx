@@ -87,11 +87,11 @@ export const ProfileSetup: React.FC<ProfileSetupProps> = ({ onComplete }) => {
   };
 
   return (
-    <div className="min-h-screen w-full flex font-sans ambient-wave">
+    <div className="h-screen w-full flex font-sans ambient-wave overflow-y-auto overflow-x-hidden">
       
       {/* LEFT SIDE - AUTH FORM */}
       {/* Changed bg-black/95 to bg-slate-950/90 for deeper color that isn't black */}
-      <div className="w-full md:w-[480px] lg:w-[550px] flex flex-col justify-center px-8 sm:px-12 md:px-16 border-r border-white/5 bg-slate-950/90 backdrop-blur-xl relative z-20 shadow-[20px_0_50px_rgba(0,0,0,0.5)]">
+      <div className="w-full md:w-[480px] lg:w-[550px] min-h-full flex flex-col justify-center px-8 sm:px-12 md:px-16 border-r border-white/5 bg-slate-950/90 backdrop-blur-xl relative z-20 shadow-[20px_0_50px_rgba(0,0,0,0.5)] py-12">
          
          <div className="mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="flex items-center gap-3 mb-6">
@@ -251,7 +251,7 @@ export const ProfileSetup: React.FC<ProfileSetupProps> = ({ onComplete }) => {
       </div>
 
       {/* RIGHT SIDE - VISUALS */}
-      <div className="hidden md:flex flex-1 relative items-center justify-center overflow-hidden">
+      <div className="hidden md:flex flex-1 relative items-center justify-center overflow-hidden h-full sticky top-0">
           {/* Content Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/20 pointer-events-none" />
           
